@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Bootstrap 例項 - 預設的分頁</title>
+ <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+ <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+ <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div ><h1>第1頁</h1></div>
+<ul class="pagination">
+ <!-- <li><a href="1.html">«</a></li>
+ <li><a href="1.html">1</a></li>
+ <li><a href="2.html">2</a></li>
+ <li><a href="3.html">3</a></li>
+ <li><a href="#">4</a></li>
+ <li><a href="#">5</a></li>
+ <li><a >...</a></li>
+ <li><a href="#">»</a></li> -->
+</ul>
+
+</body>
+</html>
+<script>
+  var pageList = [];
+  for(var i =1; i <= 272 ; i++){
+    pageList.push(i);
+  }
+  
+  $(function (){
+    //console.log(pageList.length);
+    LoadPage()
+   
+  });
+
+  // 開始寫入頁碼動作  
+  var pageSize =  Math.ceil(pageList.length / 10) ; //總頁數無條件進位
+  var nowItems = 5; // 每次顯示頁數
+  var total = pageList.length;
+  var limt = 10;
+  var offset = 0;
+  var nowNumber = 2; // 當前所在頁碼
+  var nowKeepPageList = []; // 當前所在頁碼區間
+  function LoadPage(){
+    // console.log(total);
+    //console.log(pageSize);
+    if(pageSize > 1){
+      var html ='';
+      $('.pagination').append('<li><a onclick="Previous()">«</a></li>');
+      $('.pagination').append('<li class="firstpageitem active"><a onclick="FirstPage('+ 1 +')" value="1">'+ 1 +'</a></li>');
+      $('.pagination').append('<li class="firstitem hide"><a>...</a></li>');
+      for(var i = 2; i < pageSize ; i++){
+        //console.log(i);
+          if(i < nowItems){
+            html = html + '<li><a class="pageitem" onclick="NowNumberPage('+ nowNumber +')" value="'+nowNumber+'">'+ nowNumber +'</a></li>';
+            nowNumber++;
+            offset++;
+            nowKeepPageList.push(nowNumber);
+          }
+      }
+      $('.pagination').append(html);
+      $('.pagination').append('<li class="lastitem"><a >...</a></li>');
+      $('.pagination').append('<li class="lastpageitem"><a  onclick="LastPage('+ pageSize +')" value="'+pageSize+'">'+ pageSize +'</a></li>');
+      $('.pagination').append('<li><a onclick="Next()">»</a></li>');
+    }   
+  }
+
+  // 上一頁
+  var _nowfirstnumber = 0;
+  function Previous(){
+    var _active = parseInt($('li.active a').text()); // 當前標註頁碼
+
+     // 針對當前頁碼標註控制 1
+    if(_active == pageSize){
+      $('li.active').removeClass('active'); // 刪除標註頁碼
+      $('li [value="'+(pageSize -1)+'"]').parent('li').addClass('active');//標註當前頁碼
+    }else{
+      _nowfirstnumber = parseInt($(".pageitem:first").text());
+      _nowfirstnumber--;
+      if(_nowfirstnumber > 1){      
+        $('.lastitem').removeClass('hide'); // 刪除至最後一頁後多頁符號
+        $(".pageitem:last").parent().remove();
+        $('.pageitem:first').parent().before('<li><a class="pageitem" onclick="NowNumberPage('+ _nowfirstnumber +')" value="'+_nowfirstnumber+'">'+ _nowfirstnumber +'</a></li>');
+      }  
+
+      if(_nowfirstnumber == 2){
+        // $('.lastitem').addClass('hide'); // 隱藏至最後一頁後多頁符號
+        $('.firstitem').addClass('hide'); // 顯示至第一頁後多頁符號
+      }
+    }
+   
+     // 針對當前頁碼標註控制 2
+     if(_active > 1){
+      $('li.active').removeClass('active'); // 刪除標註頁碼
+      $('li [value="'+(_active - 1)+'"]').parent('li').addClass('active');//標註當前頁碼
+    }
+  }
+
+  // 下一頁
+  var _nowlastnumber = 0
+  function Next(){
+    var _active = parseInt($('li.active a').text()); // 當前標註頁碼
+
+    // 針對當前頁碼標註控制 1
+    if(_active == 1){
+      $('li.active').removeClass('active'); // 刪除標註頁碼
+      $('li [value="2"]').parent('li').addClass('active');//標註當前頁碼
+    }else{    
+      // 增加下一頁至集合中功能
+      _nowlastnumber = parseInt($(".pageitem:last").text());
+      _nowlastnumber++;
+      $('.firstitem').removeClass('hide'); // 顯示至第一頁後多頁符號
+      if(_nowlastnumber <= pageSize -1){
+        $('.lastitem').removeClass('hide'); // 隱藏至最後一頁後多頁符號
+        $(".pageitem:first").parent().remove();
+        $('.pageitem:last').parent().after('<li><a class="pageitem" onclick="NowNumberPage('+ _nowlastnumber +')" value="'+_nowlastnumber+'">'+ _nowlastnumber +'</a></li>');
+      }  
+
+      if(_nowlastnumber == pageSize -1){
+        $('.lastitem').addClass('hide'); // 隱藏至最後一頁後多頁符號
+        $('.firstitem').removeClass('hide'); // 顯示至第一頁後多頁符號
+      }     
+    }  
+    // 針對當前頁碼標註控制 2
+    if(_active < pageSize){
+      $('li.active').removeClass('active'); // 刪除標註頁碼
+      $('li [value="'+(_active + 1)+'"]').parent('li').addClass('active');//標註當前頁碼
+    }
+  }
+
+  // 頁碼當前頁數
+  function NowNumberPage(page){
+     var _active = parseInt($('li.active a').text()); // 當前標註頁碼
+     console.log(_active);
+     $('li.active').removeClass('active'); // 刪除標註頁碼
+     $('li [value="'+ page +'"]').parent('li').addClass('active');//標註當前頁碼
+  }
+
+  // 轉至第一頁
+  function FirstPage(){
+    console.log($('.firstpageitem a').text());
+    var nownumber = parseInt($('.firstpageitem a').text());
+    if(nownumber < pageSize){
+      $(".pageitem").parent().remove(); //刪除page集合
+      $('.lastitem').removeClass('hide'); // 顯示至最後一頁後多頁符號
+      $('.firstitem').addClass('hide'); // 隱藏至第一頁後多頁符號
+      var _min  = nownumber < 4 ? (nownumber + 4) : 1 // 當前筆數往後4筆，到第 4 筆為止
+      // console.log(_min);
+      $('li.active').removeClass('active'); // 刪除標註頁碼
+      $('.firstpageitem').addClass('active');// 最後一頁加上 標註
+      $('.firstitem').after('<li><a class="pageitem" onclick="NowNumberPage('+ (nownumber +1) +')" value="1">'+ (nownumber +1) +'</a></li>');
+      for(var i = nownumber +2; i < _min ; i++){
+          //console.log(i);
+          $('.pageitem:last').parent().after('<li><a class="pageitem" onclick="NowNumberPage('+ i +')" value="'+i+'">'+ i +'</a></li>');
+      }
+    }
+  }
+
+  // 轉至最後一頁
+  function LastPage(page){
+    console.log($('.lastpageitem a').text());
+    var nownumber = parseInt($('.lastpageitem a').text());
+    if(nownumber == pageSize){
+      $(".pageitem").parent().remove(); //刪除page集合
+      $('.firstitem').removeClass('hide'); // 顯示至第一頁後多頁符號
+      $('.lastitem').addClass('hide'); // 隱藏至最後一頁後多頁符號
+      var _min  = nownumber > 4 ? (nownumber - 4) : 1 // 當前筆數往前4筆，到第 1 筆為止
+      //console.log(_min);
+      $('li.active').removeClass('active'); // 刪除標註頁碼
+      $('.lastpageitem').addClass('active');// 最後一頁加上 標註
+      $('.lastitem').before('<li><a class="pageitem" onclick="NowNumberPage('+ (nownumber -1) +')" value="'+(nownumber -1)+'">'+ (nownumber -1) +'</a></li>');
+      for(var i = nownumber -2; i > _min ; i--){
+          //console.log(i);
+          $('.pageitem:first').parent().before('<li><a class="pageitem" onclick="NowNumberPage('+ i +')" value="'+i+'"">'+ i +'</a></li>');
+      }
+    }
+  }
+</script>
+
